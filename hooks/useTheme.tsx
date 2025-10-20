@@ -1,5 +1,7 @@
-import React, { createContext, ReactNode, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
+
 
 export interface ColorScheme {
   bg: string;
@@ -94,7 +96,22 @@ interface ThemeContextType {
 const ThemeContext = createContext<undefined | ThemeContextType>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem("darkMode").then((value) => {
+      if (value) setIsDarkMode(JSON.parse(value));
+    })
+  }, [])
+
+  const toggleDarkMode = async () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    await AsyncStorage.setItem("darkMode", JSON.stringify(newMode));
+  }
+
+
 }
 
 
